@@ -5,8 +5,8 @@
 	FindBeatKun
 
 	TODO
-	- モード選択の矢印がスマホだと絵文字になる
 	- 長崎モード未実装
+	- Appアイコンを作る
 
 	#横サイズでプレイする
 
@@ -64,6 +64,10 @@ var ASSETS = {
 	
 	//サウンド
 	sound: {
+		correct: './sonds/correct.mp3',
+		incorrect: './sonds/incorrect.mp3',
+		start: './sonds/startButton.mp3',
+
 	},
 	
 	//フォント
@@ -153,8 +157,6 @@ phina.define("TitleScene", {
 			
 			self.changeMode( 1 );
 		};
-
-		
 
 		//◄（モード選択 左）
 		/*
@@ -430,6 +432,8 @@ phina.define("MainScene", {
 			
 			if( self.beatTouchFlg === TOUCH_WAITING )	//２重でタッチできないようにする
 			{
+				SoundManager.play("correct");	//正解サウンド
+
 				self.beatTouchFlg = TOUCH_SUCCESS;	//ビート君タッチフラグ成功
 				
 				/*
