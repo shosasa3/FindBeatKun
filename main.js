@@ -4,6 +4,10 @@
 	隠れビートくんをさがせ！
 	FindBeatKun
 
+	TODO
+	- モード選択の矢印がスマホだと絵文字になる
+	- 長崎モード未実装
+
 	#横サイズでプレイする
 
 
@@ -120,36 +124,36 @@ phina.define("TitleScene", {
 
 		}).addChildTo( this ).setPosition( SCREEN_X * 0.5 , SCREEN_Y * 0.5 );
 
-		//▶（モード選択 右）
+		//►（モード選択 右）
 		this.scoreLabelRight = Label({
-			text: "▶",
-			fontFamily: 'DelaGothicOne',
-			fontSize: SCREEN_X * 0.036,
+			text: "►",
+			fontFamily: 'sans-serif',
+			fontSize: SCREEN_X * 0.045,
 			fill: 'white',
 			stroke: "rgb(6, 57, 30)",
 			strokeWidth : SCREEN_X * 0.006,
 
 		}).addChildTo( this ).setPosition( SCREEN_X * 0.7 , SCREEN_Y * 0.5 );
 		this.scoreLabelRight.setInteractive( true );
-		//▶（モード選択 右）がクリックされたら
+		//►（モード選択 右）がクリックされたら
 		this.scoreLabelRight.on('pointend', function() {
   			
 			self.changeMode( 1 );
 
 		});
 
-		//◀（モード選択 左）
+		//◄（モード選択 左）
 		this.scoreLabelLeft = Label({
-			text: "◀",
+			text: "◄",
 			fontFamily: 'DelaGothicOne',
-			fontSize: SCREEN_X * 0.036,
+			fontSize: SCREEN_X * 0.045,
 			fill: 'white',
 			stroke: "rgb(6, 57, 30)",
 			strokeWidth : SCREEN_X * 0.006,
 
 		}).addChildTo( this ).setPosition( SCREEN_X * 0.3 , SCREEN_Y * 0.5 );
 		this.scoreLabelLeft.setInteractive( true );
-		//◀（モード選択 左）がクリックされたら
+		//◄（モード選択 左）がクリックされたら
 		this.scoreLabelLeft.on('pointend', function() {
 
   			self.changeMode( -1 );
