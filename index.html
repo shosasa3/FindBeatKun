@@ -1,0 +1,49 @@
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    
+    <title>ビートくんをさがせ！！</title>
+    
+    <style>
+      @font-face {
+        font-family: 'MyFont';
+        src: url('./fonts/DelaGothicOne-Regular.ttf') format('truetype');
+      }
+
+      /* 縦向き警告オーバーレイ */
+      #rotateOverlay {
+        font-family: 'MyFont', sans-serif;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        font-size: 1.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        z-index: 9999;
+      }
+    </style>
+    
+    <!-- 縦向きの時に出す警告画面 -->
+    <div id="rotateOverlay">縦向きに対応しておりません。</br>横向きにしてください🐺</div>
+
+    <!-- phina.js を読み込む(rawgit はサービスが終了したので、CDN として jsdeliver を使用) -->
+    <script src='https://cdn.jsdelivr.net/gh/phinajs/phina.js@v0.2.3/build/phina.js'></script>
+
+    <!-- メイン処理 -->
+    <script src='main.js'></script>
+
+  </head>
+  <body>
+  </body>
+</html>
+
