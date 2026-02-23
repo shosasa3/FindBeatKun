@@ -64,9 +64,9 @@ var ASSETS = {
 	
 	//サウンド
 	sound: {
-		correct: './sonds/correct.mp3',
-		incorrect: './sonds/incorrect.mp3',
-		start: './sonds/startButton.mp3',
+		correct: './sounds/correct.mp3',
+		incorrect: './sounds/incorrect.mp3',
+		start: './sounds/startButton.mp3',
 
 	},
 	
