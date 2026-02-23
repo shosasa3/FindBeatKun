@@ -57,7 +57,9 @@ var ASSETS = {
 		'incorrect': './images/incorrect.png',	//不正解の×
 		'nikukyu': './images/nikukyu.png',		//肉球（ページ遷移に使用）
 		'scratch': './images/scratch.png',		//爪痕（リザルトで使用）
-		
+		'modeUILeft': './images/ModeSelectLeft.png',
+		'modeUIRight': './images/ModeSelectRight.png',
+
 	},
 	
 	//サウンド
@@ -125,12 +127,13 @@ phina.define("TitleScene", {
 		}).addChildTo( this ).setPosition( SCREEN_X * 0.5 , SCREEN_Y * 0.5 );
 
 		//►（モード選択 右）
+		/*
 		this.scoreLabelRight = Label({
 			text: "►",
 			fontFamily: 'sans-serif',
 			fontSize: SCREEN_X * 0.045,
 			fill: 'white',
-			stroke: "rgb(6, 57, 30)",
+			stroke: "#06391e",
 			strokeWidth : SCREEN_X * 0.006,
 
 		}).addChildTo( this ).setPosition( SCREEN_X * 0.7 , SCREEN_Y * 0.5 );
@@ -141,8 +144,20 @@ phina.define("TitleScene", {
 			self.changeMode( 1 );
 
 		});
+		*/
+		//モード選択 右（スプライトに変更）
+		this.modeUIRight = Sprite('modeUIRight').addChildTo( this ).setPosition( SCREEN_X * 0.7 , SCREEN_Y * 0.5 );
+		this.modeUIRight.setScale( SCREEN_X_RATIO,SCREEN_Y_RATIO  );
+		this.modeUIRight.setInteractive( true );	//タッチを可能にする
+		this.modeUIRight.onpointstart = function() {
+			
+			self.changeMode( 1 );
+		};
+
+		
 
 		//◄（モード選択 左）
+		/*
 		this.scoreLabelLeft = Label({
 			text: "◄",
 			fontFamily: 'DelaGothicOne',
@@ -159,6 +174,17 @@ phina.define("TitleScene", {
   			self.changeMode( -1 );
 		
 		});
+		*/
+
+		//モード選択 左（スプライトに変更）
+		this.modeUILeft = Sprite('modeUILeft').addChildTo( this ).setPosition( SCREEN_X * 0.3 , SCREEN_Y * 0.5 );
+		this.modeUILeft.setScale( SCREEN_X_RATIO,SCREEN_Y_RATIO  );
+		this.modeUILeft.setInteractive( true );	//タッチを可能にする
+		this.modeUILeft.onpointstart = function() {
+			
+			self.changeMode( 1 );
+		};
+
 
 		//"はじめる" ボタン
 		this.startButton = Button({
