@@ -432,7 +432,7 @@ phina.define("MainScene", {
 			
 			if( self.beatTouchFlg === TOUCH_WAITING )	//２重でタッチできないようにする
 			{
-				SoundManager.play("correct");	//正解サウンド
+				SoundManager.play('correct');	//正解サウンド
 
 				self.beatTouchFlg = TOUCH_SUCCESS;	//ビート君タッチフラグ成功
 				
