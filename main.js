@@ -5,7 +5,9 @@
 	FindBeatKun
 
 	TODO
-	- 長崎モード未実装
+	- 長崎モード（一応OK）
+	- ホームボタンをつくるのか？
+	- ポストシステム
 	- Appアイコンを作る
 
 	#横サイズでプレイする
@@ -48,11 +50,13 @@ var DEBUG_FLG = false;	//デバッグフラグ
 var ASSETS = {
 	//画像
 	image: {
+		'titleBG': './images/titleBG.jpg',		//タイトル背景
 		'camo1': './images/1_1.png',			//迷彩_1
 		'camo2': './images/2_1.png',			//迷彩_2
 		'camo3': './images/3_1.png',			//迷彩_3
 		'camo':  './images/all_camo.png',		//迷彩セット
 		'beat':  './images/beat_all.png',		//ビート君セット
+		'nagasaki': './images/nagasaki_all.png',	//長崎県セット
 		'correct': './images/correct.png',		//正解の〇
 		'incorrect': './images/incorrect.png',	//不正解の×
 		'nikukyu': './images/nikukyu.png',		//肉球（ページ遷移に使用）
@@ -101,8 +105,11 @@ phina.define("TitleScene", {
 		
 		console.log( SCREEN_X );
 
-		// 背景色
+		// 背景
 		this.backgroundColor = '#2d5030';
+		this.titleBG = Sprite('titleBG').addChildTo( this ).setPosition( this.gridX.center() , this.gridY.center() );
+		this.titleBG.setScale( SCREEN_X_RATIO,SCREEN_Y_RATIO  );
+		
 
 		//モード選択テキスト
 		this.modes = ['ビートくんモード', '長崎県モード'];
@@ -155,6 +162,8 @@ phina.define("TitleScene", {
 		this.modeUIRight.setInteractive( true );	//タッチを可能にする
 		this.modeUIRight.onpointstart = function() {
 			
+			SoundManager.play('start');	//選択サウンド
+
 			self.changeMode( 1 );
 		};
 
@@ -184,6 +193,8 @@ phina.define("TitleScene", {
 		this.modeUILeft.setInteractive( true );	//タッチを可能にする
 		this.modeUILeft.onpointstart = function() {
 			
+			SoundManager.play('start');	//選択サウンド
+
 			self.changeMode( 1 );
 		};
 
@@ -202,6 +213,9 @@ phina.define("TitleScene", {
 		
 		//"はじめる"ボタンが押されたら（ iPhone/iPad/PC全部対応しているはず.. ）
 		this.startButton.onpointstart = function() {
+
+			SoundManager.play('start');	//選択サウンド
+
 			//メインシーンに遷移
 			self.exit( "main" ,{ mode: self.modeIndex } );
 		};
@@ -315,8 +329,18 @@ phina.define("MainScene", {
 		.setPosition( this.gridX.center(), this.gridY.center() )
 		.hide();
 		
-		//ビート君
-		this.beat = Sprite('beat',187,187).addChildTo( this ).setPosition( Random.randfloat( 50, 900 ), Random.randfloat( 50, 440 )).hide();
+
+		//ビート君（or 長崎県）
+		if( this.modeIndex === 0 )	//モードによって画像を変える
+		{
+			//ビート君
+			this.beat = Sprite('beat',187,187).addChildTo( this ).setPosition( Random.randfloat( SCREEN_X * 0.3, SCREEN_X * 0.7 ), Random.randfloat( SCREEN_Y * 0.4, SCREEN_Y * 0.7 )).hide();
+		}
+		else
+		{
+			//長崎県
+			this.beat = Sprite('nagasaki',187,187).addChildTo( this ).setPosition( Random.randfloat( SCREEN_X * 0.3, SCREEN_X * 0.7 ), Random.randfloat( SCREEN_Y * 0.4, SCREEN_Y * 0.7 )).hide();
+		}
 		this.beat.frameIndex = 0;
 		this.b_ratio = ( SCREEN_X * 0.12 ) / 187;			//ビート君の画像のサイズで割って係数を出す
 		this.beat.setScale( this.b_ratio,this.b_ratio );	//画面サイズに調整する
@@ -326,9 +350,16 @@ phina.define("MainScene", {
 		const TOUCH_FALSE 	= 2;
 		this.beatTouchFlg = TOUCH_WAITING;
 
-		//ビート君をタッチしたときに表示されるテキスト（使用しない）
-		this.beatTouchLabel = Label( "見つかっちゃった！" ).addChildTo( this );
-		this.beatTouchLabel.fill = 'white';
+		//間違った場合、正解のビート君の場所を提示するテキスト
+		this.beatTouchLabel = Label({
+			text: "ここにいたよ！",
+			fontFamily: 'DelaGothicOne',
+			fontSize: SCREEN_X * 0.03,
+			fill: 'white',
+			stroke: "#000000ff",
+			strokeWidth : SCREEN_X * 0.004,
+
+		}).addChildTo( this );
 		this.beatTouchLabel.hide();
 		this.beatTouchLabel.tweener.clear();
 
@@ -513,9 +544,6 @@ phina.define("MainScene", {
 					})
 				.play();
 
-				self.beatTouchLabel.x = self.beat.x + 500;
-				self.beatTouchLabel.y = self.beat.y - 50;
-				
 				/*
 				正解〇だけにする
 				self.beatTouchLabel.show();
@@ -547,6 +575,8 @@ phina.define("MainScene", {
 				// e.target が beatでなければ背景をタッチ
 				if ( e.target !== self.beat )
 				{
+					SoundManager.play('incorrect');	//不正解サウンド
+
 					self.beatTouchFlg = TOUCH_FALSE;	//ビート君タッチフラグ失敗
 
 					self.incorrect.x = e.pointer.x;
@@ -561,13 +591,31 @@ phina.define("MainScene", {
 
 					},20,"swing" )
 					.call( function(){
+
+						//正解のビート君の場所を〇で表示する
+						self.correct.x = self.beat.x;
+						self.correct.y = self.beat.y;
+						self.correct.setScale( self.beat.scaleX,self.beat.scaleY );
+						self.correct.show();
+
+						//"ここですよ！"ラベル アニメーション
+						let a = self.calculateBeatTouchLabelPos();
+						self.beatTouchLabel.show();
+						self.beatTouchLabel.tweener
+							.to({
+								x: a.toX,
+								y: a.toY,
+
+							},200,"swing")
+						.play();
+						
 						self.incorrect.tweener
 							.to({
 								scaleX: self.beat.scaleX,
 								scaleY: self.beat.scaleY,
 
 							},20,"swing" )
-							.wait( 500 )
+							.wait( 1500 )
 							.call( function(){
 								//肉球アニメーション
 								self.nikyuAnimation();
@@ -580,7 +628,6 @@ phina.define("MainScene", {
       			}
 			}
 		};
-
 
 		this.showTutorial();	//チュートリアル画面表示
 
@@ -732,8 +779,10 @@ phina.define("MainScene", {
 		}).addChildTo( overlay ).setPosition( 0 , (SCREEN_Y * 0.25) );
 		button.fontSize = button.width * 0.18;	//フォントサイズ 調整
 		
-		// OKを押したらチュートリアルを閉じる
+		// "はじめる"を押したらチュートリアルを閉じる
 		button.onpointstart = function() {
+			SoundManager.play('start');	//選択サウンド
+			
 			overlay.remove();
 
 			self.state = 'countdown'; // カウントダウンへ移行
@@ -792,6 +841,7 @@ phina.define("MainScene", {
 	*/
 	nextBeatkun: function() {
 
+		//表示されていたラベルを隠す
 		this.beatTouchLabel.hide();
 		this.correct.hide();
 
@@ -917,6 +967,73 @@ phina.define("MainScene", {
 			
 	}, //end calculatePlusTimeByTime()
 
+	/*
+		@class calculateBeatTouchLabelPos()
+		#正解のビート君の位置にラベルを配置する際の座標を計算
+
+	*/
+	calculateBeatTouchLabelPos: function() {
+
+		if ( this.beat.x >= this.gridX.center() && this.beat.y < this.gridY.center() ) {
+			
+			// 右上
+			let to   = this.beat.x;
+			let from = this.beat.x - (SCREEN_X * 0.05);
+
+			this.beatTouchLabel.x = from;
+			this.beatTouchLabel.y = this.beat.y + (SCREEN_Y * 0.15);
+
+			return{
+				toX: to,
+				toY: this.beatTouchLabel.y,
+			};
+
+		} else if ( this.beat.x < this.gridX.center() && this.beat.y < this.gridY.center() ) {
+			
+			// 左上
+			let to   = this.beat.x;
+			let from = this.beat.x + (SCREEN_X * 0.05);
+
+			this.beatTouchLabel.x = from;
+			this.beatTouchLabel.y = this.beat.y + (SCREEN_Y * 0.15);
+			
+			return{
+				toX: to,
+				toY: this.beatTouchLabel.y,
+			};
+
+		} else if ( this.beat.x < this.gridX.center() && this.beat.y >= this.gridY.center() ) {
+			
+			// 左下
+			let to   = this.beat.x;
+			let from = this.beat.x + (SCREEN_X * 0.05);
+
+			this.beatTouchLabel.x = from;
+			this.beatTouchLabel.y = this.beat.y - (SCREEN_Y * 0.15);
+
+			return{
+				toX: to,
+				toY: this.beatTouchLabel.y,
+			};
+
+		} else {
+			
+			// 右下
+			let to   = this.beat.x;
+			let from = this.beat.x - (SCREEN_X * 0.05);
+
+			this.beatTouchLabel.x = from;
+			this.beatTouchLabel.y = this.beat.y - (SCREEN_Y * 0.15);
+
+			return{
+				toX: to,
+				toY: this.beatTouchLabel.y,
+			};
+
+		}
+			
+	}, //end calculateBeatTouchLabelPos()
+
 
 }); //end MainScene
 
@@ -943,7 +1060,7 @@ phina.define("ResultScene", {
 		let self = this;	//参照用
 
 		// 背景色
-		this.backgroundColor = '#58430c';
+		this.backgroundColor = '#fbfbf9';
 
 		//モードUIラベル（モードごとにテキスト変化）
 		this.modeText = "ビートくんをさがせ";
@@ -1024,8 +1141,8 @@ phina.define("ResultScene", {
 			fontFamily: 'DelaGothicOne',
 			fontSize: SCREEN_X * 0.04,
 			fill: 'white',
-			stroke: "#000000ff",
-			strokeWidth : SCREEN_X * 0.0048,
+			stroke: "#002955",
+			strokeWidth : SCREEN_X * 0.006,
 
 		}).addChildTo( this ).setPosition( SCREEN_X * 0.5 , SCREEN_Y * 0.6 ).setScale( 2.0,2.0 );
 		this.resultTextLabel.hide();
@@ -1108,8 +1225,8 @@ phina.define("ResultScene", {
 		this.oneMoreButton = Button({
 			text : 'もう１回',
 			fontFamily: 'DelaGothicOne',
-			fill : 'white',
-			fontColor: '#000000',
+			fill : '#2d5030',
+			fontColor: '#fbfbf9',
 			width: 200 * SCREEN_X_RATIO,
 			height: 70 * SCREEN_Y_RATIO,
 	
@@ -1126,8 +1243,8 @@ phina.define("ResultScene", {
 		this.postButton = Button({
 			text : 'ポストする',
 			fontFamily: 'DelaGothicOne',
-			fill : 'white',
-			fontColor: '#000000',
+			fill : '#2d5030',
+			fontColor: '#fbfbf9',
 			width: 200 * SCREEN_X_RATIO,
 			height: 70 * SCREEN_Y_RATIO,
 	
