@@ -1312,7 +1312,7 @@ phina.define("ResultScene", {
 		};
 
 		//"ポスト"ボタンが押されたら（ iPhone/iPad/PC全部対応しているはず.. ）
-		this.postButton.onpointstart = function() {
+		this.postButton.onclick = function() {
 				
 				let text = 'あなたの記録は{0}回！{1}'.format( param.score,self.getResultText( param.score ) );
 		        let url = phina.social.Twitter.createURL({
