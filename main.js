@@ -1095,8 +1095,8 @@ phina.define("ResultScene", {
 		this.backgroundColor = '#fbfbf9';
 
 		//モードUIラベル（モードごとにテキスト変化）
-		this.modeText = "ビートくんをさがせ";
-		if( param.mode === 1 ) this.modeText = "長崎県をさがせ";
+		this.modeText = "ビートくんをさがせ！";
+		if( param.mode === 1 ) this.modeText = "長崎県をさがせ！";
 
 		this.modeUILabel = Label({
 			text: this.modeText,
@@ -1312,9 +1312,9 @@ phina.define("ResultScene", {
 		};
 
 		//"ポスト"ボタンが押されたら（ iPhone/iPad/PC全部対応しているはず.. ）
-		this.postButton.onclick = function() {
+		this.postButton.onclick = function() {	//なぜかonclickでないと動かない...？
 				
-				let text = 'あなたの記録は{0}回！{1}'.format( param.score,self.getResultText( param.score ) );
+				let text = '『{0}』あなたの記録は{1}回！{2}'.format( self.modeText,param.score,self.getResultText( param.score ) );
 		        let url = phina.social.Twitter.createURL({
 		          text: text,
 		          hashtags: params.hashtags,
