@@ -755,8 +755,18 @@ phina.define("MainScene", {
 		}).addChildTo( overlay ).setPosition( 0 , -(SCREEN_Y * 0.25) );	//overlayのポジションを基点としてオフセットしている
 
 		// チュートリアル説明文
+		let ruleText = "";
+		if( this.modeIndex === 0 ){
+			//ビート君モード
+			ruleText = "隠れているビートくんをタッチして見つけよう！\n\n別の場所をタッチしたらゲームオーバーなので注意しよう！";
+		
+		}else{
+			//長崎県モード
+			ruleText = "隠れている長崎県をタッチして見つけよう！\n\n別の場所をタッチしたらゲームオーバーなので注意しよう！";
+		
+		}
 		const labelRule = Label({
-			text: '隠れているビートくんをタッチして見つけよう！\n\n別の場所をタッチしたらゲームオーバーなので注意しよう！',
+			text: ruleText,
 			fontFamily: 'DelaGothicOne',
 			fontSize: SCREEN_X * 0.03,
 			fill: 'white',
