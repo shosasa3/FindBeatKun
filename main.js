@@ -6,9 +6,6 @@
 
 	TODO
 	- 長崎モード（一応OK）
-	- ホームボタンをつくるのか？
-	- ポストシステム
-	- Appアイコンを作る
 
 	#横サイズでプレイする
 
@@ -639,6 +636,7 @@ phina.define("MainScene", {
 
 		if ( this.state !== 'playing' ) return; // ゲーム中以外はゲーム動作しない
 		if ( isPortrait ) return; 	   // 縦向き中はゲーム動作しない
+		if( this.beatTouchFlg === 2 ) return;	//失敗したらタイマーを止める（マジックナンバーは良くない）
 
 		let self = this;	//参照しておく
 
@@ -749,7 +747,7 @@ phina.define("MainScene", {
 		const labelHowto = Label({
 			text: '遊び方',
 			fontFamily: 'DelaGothicOne',
-			fontSize: SCREEN_X * 0.03,
+			fontSize: SCREEN_X * 0.035,
 			fill: 'white',
 			align: 'center',
 			stroke: "black",
@@ -760,7 +758,7 @@ phina.define("MainScene", {
 		const labelRule = Label({
 			text: '隠れているビートくんをタッチして見つけよう！\n\n別の場所をタッチしたらゲームオーバーなので注意しよう！',
 			fontFamily: 'DelaGothicOne',
-			fontSize: SCREEN_X * 0.02,
+			fontSize: SCREEN_X * 0.03,
 			fill: 'white',
 			align: 'center',
 			stroke: "black",
@@ -861,7 +859,7 @@ phina.define("MainScene", {
 			this.beat.x = Random.randfloat( SCREEN_X * 0.05, SCREEN_X * 0.95 );
 			this.beat.y = Random.randfloat( SCREEN_Y * 0.25, SCREEN_Y * 0.95 );
 
-			//回転
+			//回転調整
 			this.beat.rotation = Random.randint( 0,360 );
 			
 			//大きさ調整
@@ -882,6 +880,18 @@ phina.define("MainScene", {
 			let rand =  Random.randfloat( 0.8,0.9 );
 			this.beat.setScale( this.b_ratio * rand ,this.b_ratio * rand );
 
+			//回転調整
+			rand = Random.randint( 0,1 );
+			if( rand ){
+			
+				this.beat.rotation = Random.randint( 0,180 );
+			
+			}else{
+		
+				this.beat.rotation = Random.randint( 181,360 );
+		
+			}
+
 			//ビート君色変更（３色）
 			this.beat.frameIndex = Random.randint( 0,2 );
 		}
@@ -896,6 +906,18 @@ phina.define("MainScene", {
 			let rand =  Random.randfloat( 0.8,0.9 );
 			this.beat.setScale( this.b_ratio * rand ,this.b_ratio * rand );
 
+			//回転調整
+			rand = Random.randint( 0,1 );
+			if( rand ){
+			
+				this.beat.rotation = Random.randint( 0,180 );
+			
+			}else{
+		
+				this.beat.rotation = Random.randint( 181,360 );
+		
+			}
+
 			//ビート君色変更（２色のみ）
 			this.beat.frameIndex = Random.randint( 0,1 );
 		}
@@ -903,8 +925,8 @@ phina.define("MainScene", {
 		else if( this.score >= 5 && this.score < 10 )
 		{
 			//座標調整
-			this.beat.x = Random.randfloat( SCREEN_X * 0.2, SCREEN_X * 0.8 );
-			this.beat.y = Random.randfloat( SCREEN_Y * 0.3, SCREEN_Y * 0.8 );
+			this.beat.x = Random.randfloat( SCREEN_X * 0.1, SCREEN_X * 0.9 );
+			this.beat.y = Random.randfloat( SCREEN_Y * 0.25, SCREEN_Y * 0.9 );
 			
 			//大きさ調整
 			let rand =  Random.randfloat( 0.8,0.95 );
@@ -917,7 +939,7 @@ phina.define("MainScene", {
 		else if( this.score >= 2 && this.score < 5 )
 		{
 			//座標調整
-			this.beat.x = Random.randfloat( SCREEN_X * 0.2, SCREEN_X * 0.8 );
+			this.beat.x = Random.randfloat( SCREEN_X * 0.15, SCREEN_X * 0.85 );
 			this.beat.y = Random.randfloat( SCREEN_Y * 0.3, SCREEN_Y * 0.8 );
 			
 			//大きさ調整
@@ -1083,8 +1105,10 @@ phina.define("ResultScene", {
 			.wait( 200 )
 			.call( function(){	//スコアUIアニメーションが終わったら
 
+				//ボタン関連 表示
 				self.oneMoreButton.show();
 				self.postButton.show();
+				self.toTitleButton.show();
 
 				//self.beatSprite.show();
 				
@@ -1221,6 +1245,25 @@ phina.define("ResultScene", {
 		.play();
 		*/
 
+		//"タイトルへ" ボタン
+		this.toTitleButton = Button({
+			text : 'タイトルへ',
+			fontFamily: 'DelaGothicOne',
+			fill : '#2d5030',
+			fontColor: '#fbfbf9',
+			width: 120 * SCREEN_X_RATIO,
+			height: 40 * SCREEN_Y_RATIO,
+	
+		}).addChildTo( this ).setPosition( SCREEN_X * 0.12 , SCREEN_Y * 0.12 );
+		this.toTitleButton.fontSize = this.toTitleButton.width * 0.15;	//フォントサイズ 調整
+		this.toTitleButton.hide();
+		//"タイトルへ"ボタンが押されたら（ iPhone/iPad/PC全部対応しているはず.. ）
+		this.toTitleButton.onpointstart = function() {
+			//タイトルシーンに遷移
+			self.exit( "title" );
+		};
+
+
 		//"もう１回" ボタン
 		this.oneMoreButton = Button({
 			text : 'もう１回',
@@ -1236,7 +1279,7 @@ phina.define("ResultScene", {
 		//"もう１回"ボタンが押されたら（ iPhone/iPad/PC全部対応しているはず.. ）
 		this.oneMoreButton.onpointstart = function() {
 			//メインシーンに遷移
-			self.exit( "main" );
+			self.exit( "main" ,{ mode: param.mode });
 		};
 
 		//"ポスト"ボタン
@@ -1251,9 +1294,24 @@ phina.define("ResultScene", {
 		}).addChildTo( this ).setPosition( SCREEN_X * 0.7 , SCREEN_Y * 0.8 );
 		this.postButton.fontSize = this.postButton.width * 0.18;	//フォントサイズ 調整
 		this.postButton.hide();
+
+		//shareするデータ
+		let params = {
+			  hashtags: ["ビートくんをさがせ","BEASTX","Mリーグ"],	//ハッシュタグ
+			  url: phina.global.location && phina.global.location.href,
+		};
+
 		//"ポスト"ボタンが押されたら（ iPhone/iPad/PC全部対応しているはず.. ）
 		this.postButton.onpointstart = function() {
+				
+				let text = 'あなたの記録は{0}回！{1}'.format( param.score,self.getResultText( param.score ) );
+		        let url = phina.social.Twitter.createURL({
+		          text: text,
+		          hashtags: params.hashtags,
+		          url: params.url,
 
+		        });
+		        window.open( url, 'share window', 'width=480, height=320' );
 		};
 	
 	}, //end init
@@ -1273,12 +1331,40 @@ phina.define("ResultScene", {
 		@return table[i].text...リザルト用テキスト
 	*/
 	getResultText: function( score ) {
-		
+
 		const textTable = [
-			{ min: 10, text: '伝説級！あなたは神です' },
-			{ min: 8,  text: '素晴らしい！プロ級です' },
-			{ min: 5,  text: 'なかなか良いですね' },
-			{ min: 0,  text: 'まだまだこれから！' },
+			{ min: 62, text: 'あなたは天に選ばれた・・！天和級' },
+			{ min: 60, text: 'もう伝説級！役満九蓮宝燈級' },
+			{ min: 58, text: '字牌がすべて集まった！役満字一色級' },
+			{ min: 56, text: '全部揃えた！役満大三元級' },
+			{ min: 54, text: 'カッコイイ役満国士無双級' },
+			{ min: 52, text: 'ザ・役満四暗刻級' },
+			{ min: 50, text: '見たか！リーヅモ一発清一色級' },
+			{ min: 48, text: 'リーチホンイツどうだ小三元もだ！級' },
+			{ min: 46, text: 'これは珍しい二盃口！級' },
+			{ min: 44, text: 'リーヅモチートイ嬉しいウラウラ級' },
+			{ min: 42, text: 'リーヅモ三暗刻ビックリ裏３も！級' },
+			{ min: 40, text: 'やったね！リーヅモホンイツ級' },
+			{ min: 38, text: 'メンタンピンツモ一発ドラ！級' },
+			{ min: 36, text: '鳴いてアガった清一色級' },
+			{ min: 34, text: 'こりゃ嬉しいダブリー一発ツモ級' },			
+			{ min: 32, text: 'これでアガれるの！？チャンカン級' },
+			{ min: 30, text: '鳴いてホンイツ満貫だよ！級' },
+			{ min: 28, text: 'リーヅモ一通最高だね！級' },
+			{ min: 26, text: 'リーヅモ三色気持ち良い級' },
+			{ min: 24, text: 'ここにアガリ牌が！嶺上開花だぜ級' },
+			{ min: 22, text: 'メンピンツモ裏ドラも乗った級' },
+			{ min: 20, text: '最後まで粘ったハイテイツモ級' },
+			{ min: 18, text: '鳴いてトイトイよく攻め切った級' },
+			{ min: 16, text: '鳴いてチャンタよくかわしました級' },
+			{ min: 14, text: '七対子ダマの技あり級' },
+			{ min: 12, text: 'メンピンツモのアガリ級' },
+			{ min: 10, text: '役牌ポン！早くアガったよ級' },
+			{ min: 8,  text: '喰いタンで上手く流した級' },
+			{ min: 6,  text: 'ピンフのみでアガった級' },
+			{ min: 4,  text: 'テンパイまではいったよ級' },
+			{ min: 2,  text: 'イーシャンテンいい調子ですね級' },
+			{ min: 0,  text: 'もう少し頑張ってみよう級' },
 		];
 
 		for (let i = 0; i < textTable.length; i++) {
