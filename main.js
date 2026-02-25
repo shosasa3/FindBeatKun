@@ -1269,6 +1269,8 @@ phina.define("ResultScene", {
 		this.toTitleButton.hide();
 		//"タイトルへ"ボタンが押されたら（ iPhone/iPad/PC全部対応しているはず.. ）
 		this.toTitleButton.onpointstart = function() {
+			SoundManager.play('start');	//選択サウンド
+
 			//タイトルシーンに遷移
 			self.exit( "title" );
 		};
@@ -1288,6 +1290,8 @@ phina.define("ResultScene", {
 		this.oneMoreButton.hide();
 		//"もう１回"ボタンが押されたら（ iPhone/iPad/PC全部対応しているはず.. ）
 		this.oneMoreButton.onpointstart = function() {
+			SoundManager.play('start');	//選択サウンド
+
 			//メインシーンに遷移
 			self.exit( "main" ,{ mode: param.mode });
 		};
@@ -1313,7 +1317,9 @@ phina.define("ResultScene", {
 
 		//"ポスト"ボタンが押されたら（ iPhone/iPad/PC全部対応しているはず.. ）
 		this.postButton.onclick = function() {	//なぜかonclickでないと動かない...？
-				
+
+				SoundManager.play('start');	//選択サウンド
+
 				let text = '『{0}』あなたの記録は{1}回！{2}'.format( self.modeText,param.score,self.getResultText( param.score ) );
 		        let url = phina.social.Twitter.createURL({
 		          text: text,
